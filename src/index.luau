@@ -31,7 +31,7 @@ Nova.response = require("@utils/Response")
 local function devMiddleware(req: Types.Request, next: Types.Next)
     local res =  next()
 
-    local status = res.status or 200
+    local status = res.config.status or 200
     local color = "\27[31m"
     
     if status >= 200 and status < 300 then 
