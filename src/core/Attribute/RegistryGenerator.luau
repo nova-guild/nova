@@ -37,9 +37,8 @@ local function loadRegistry(mainDir: string)
 
 				if ok and type(result) == "function" or type(result) == "table" then
 					registry[namespace][name] = result
-					print(`\27[32mLoaded {namespace}: {name}\27[0m`)
-				else
-					print(`[Nova] Failed to load {namespace} '{name}': {tostring(result)}`)
+				-- else
+				-- 	print(`[Nova] Failed to load {namespace} '{name}': {tostring(result)}`)
 				end
 			end
 		end

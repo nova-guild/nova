@@ -5,14 +5,16 @@ local AttributeResolver = require("../Attribute/Resolver")
 local Attributes = require("../Attribute")
 local Chain = require("../../utils/Chain")
 local RouteHelper = require("./Helpers")
+local RouteLogger = require("@utils/Logger")
 
 local METHOD_NAMES = RouteHelper.METHOD_MAP
 local readDir = fs.readDir
 local metadata = fs.metadata
 local cwd = process.cwd
 
-local function buildAttributeMiddlewares(decoratorStrings: { string }): { any }
+local function buildAttributeMiddlewares(decoratorStrings: { string }): ({ any }, { [string]: { string } })
     local middlewares = {}
+    local grouped: { [string]: { string } } = {}
 
     for _, raw in decoratorStrings do
         local parsedDecor = AttributeResolver.parseAttribute(raw)
@@ -22,14 +24,21 @@ local function buildAttributeMiddlewares(decoratorStrings: { string }): { any }
 
             if factory then
                 table.insert(middlewares, factory(parsedDecor.args))
+
+                if not grouped[parsedDecor.name] then
+                    grouped[parsedDecor.name] = {}
+                end
+                for _, arg in parsedDecor.args do
+                    table.insert(grouped[parsedDecor.name], arg)
+                end
             end
         end
     end
 
-    return middlewares
+    return middlewares, grouped
 end
 
-local function applyAttributes(routeModule: any, extractedDecorators: { [string]: { string } })
+local function applyAttributes(routeModule: any, extractedDecorators: { [string]: { string } }, routeKey: string)
     for _, method in METHOD_NAMES do
         local handler = routeModule[method]
         if typeof(handler) ~= "function" then
@@ -45,12 +54,18 @@ local function applyAttributes(routeModule: any, extractedDecorators: { [string]
             end
         end
 
+        local grouped: { [string]: { string } } = {}
+
         if decoratorStrings and #decoratorStrings > 0 then
-            local middlewares = buildAttributeMiddlewares(decoratorStrings)
+            local middlewares, resolvedGrouped = buildAttributeMiddlewares(decoratorStrings)
+            grouped = resolvedGrouped
+
             if #middlewares > 0 then
                 routeModule[method] = Chain(middlewares, handler)
             end
         end
+
+        RouteLogger.collect(routeKey, method, grouped)
     end
 end
 
@@ -72,11 +87,11 @@ local function generateRoute(currentDir: string, currentRoute: string)
             
             local routeModule = require(modulePath) :: any
 
-            applyAttributes(routeModule, extractedAttributes)
+            applyAttributes(routeModule, extractedAttributes, routeKey)
 
             registerRoute(routeKey, routeModule)
             
-            print(`\27[32mRegistered Route: {routeKey}\27[0m`)
+            -- print(`\27[32mRegistered Route: {routeKey}\27[0m`)
 
         elseif metadata(resolvedPath).kind == "dir" or metadata(resolvedPath).kind == "directory" then
             local nextRoute = currentRoute .. "/" .. item

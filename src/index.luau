@@ -9,6 +9,7 @@ local loadEnv = require("@utils/LoadEnv")
 local MainDir = require("@utils/MainDir")
 local generateAlias = require("@utils/GenerateAlias")
 local attrRegistryGenerator = require("@core/Attribute/RegistryGenerator")
+local RouteLogger = require("@utils/Logger")
 
 export type Next = Types.Next
 export type Nova = Types.Nova
@@ -29,19 +30,20 @@ Nova.chain = require("@utils/Chain")
 Nova.response = require("@utils/Response")
 
 local function devMiddleware(req: Types.Request, next: Types.Next)
-    local res =  next()
-
+    local res = next()
     local status = res.config.status or 200
-    local color = "\27[31m"
-    
-    if status >= 200 and status < 300 then 
-        color = "\27[32m"
-    elseif status >= 300 and status < 400 then 
-        color = "\27[34m" 
+
+    local statusColor = "\27[31m"
+    if status >= 200 and status < 300 then
+        statusColor = "\27[32m"
+    elseif status >= 300 and status < 400 then
+        statusColor = "\27[34m"
     end
 
     if req.path ~= "/favicon.ico" then
-        print(string.format("[%s] %s %s%d\27[0m", req.method, req.path, color, status))
+        local attrs = RouteLogger.getAttributes(req.path, req.method)
+        local attrSuffix = attrs ~= "" and ("  " .. statusColor .. attrs .. "\27[0m") or ""
+        print(string.format("[%s] %s %s%d\27[0m%s", req.method, req.path, statusColor, status, attrSuffix))
     end
 end
 
@@ -86,8 +88,12 @@ function Nova:listen(handler: () -> ())
         }
     end
 
+    RouteLogger.setMiddlewares(self.middlewares or {})
+
     attrRegistryGenerator.loadRegistry(mainDir)
     generateRoute(mainDir, "")
+
+    RouteLogger.flush()
 
     local allMiddlewares = self.middlewares and table.clone(self.middlewares) or {}
 
