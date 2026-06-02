@@ -31,7 +31,17 @@ export default defineConfig({
             { text: 'Project Stucture', link: '/docs/guides/project-structure' },
             { text: 'Routing', link: '/docs/guides/routing' },
             { text: 'Request & Response', link: '/docs/guides/req-res' },
-            { text: 'Middlewares', link: '/docs/guides/middleware' }
+            {
+                text: 'Middleware',
+                link: '/docs/guides/middleware',
+                items: [
+                    { text: 'Guard', link: '/docs/guides/middleware/guard' },
+                    { text: 'Validator', link: '/docs/guides/middleware/validator' },
+                    { text: 'Interceptor', link: '/docs/guides/middleware/interceptor' },
+                    
+                ]
+            },
+            { text: 'Exception', link: '/docs/guides/exception' },
           ]
         },
         {

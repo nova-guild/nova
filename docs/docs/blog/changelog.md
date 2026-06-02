@@ -1,5 +1,47 @@
 # Changelog
 
+## `v0.6.0` - June 2, 2026
+
+***`Nova.chain()` has been removed from the public API. Route-specific middleware is now handled exclusively through Attributes (`--@Guard`, `--@Interceptor`, `--@Validator`).***
+
+### Added
+
+- Exception handling utility with common HTTP error responses (`Nova.exception`) (#76)
+- Request validation via `--@Validator` attribute with support for `body`, `param`, and `query` (#73)
+- Interceptor support via `--@Interceptor` attribute using onion architecture (#72)
+- Guard attribute now supports multiple rules — `--@Guard(Auth, Admin)` (#72)
+- Initial `--@Guard` attribute support with comment-based syntax (#69)
+
+### Changed
+
+- Startup logger now displays registered routes with their applied Attributes (#75)
+- Runtime request logs now include status code and applied Attributes, with color-coded output by status class (`2xx` green, `3xx` blue, `4xx`/`5xx` red) (#75)
+- Core architecture restructured and modularized; adapters renamed (#71)
+- `libs/` renamed to `adapters/` (#69)
+- `Nova.chain()` is no longer exposed publicly — route-specific middleware must now be defined using Attributes (#69)
+
+### Fixed
+
+- Correct status property access in `devMiddleware` (#74)
+
+---
+
+**Before**
+```luau
+Home.Get = Nova.chain({ AuthMiddleware, AdminMiddleware }, function()
+    return Nova.response.send("Hello, World")
+end)
+```
+
+**After**
+```luau
+--@Guard(AuthRule, AdminRule)
+--@Interceptor(TransformRule)
+function Home.Get()
+    return Nova.response.send("Hello, World")
+end
+```
+
 ## `v0.5.7-test` - May 4, 2026
 
 ### Changed

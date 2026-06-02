@@ -1,9 +1,9 @@
-name = "nova_guild/nova_core"
-version = "0.5.7"
+name = "hypernova_lab/nova_core"
+version = "0.6.0"
 description = "A filesystem-based web framework for Luau runtimes, with out-of-the-box support for Lute, Lune and Zune."
-authors = ["Nova Guild (https://github.com/nova-guild)"]
+authors = ["Hypernova Lab (https://github.com/hypernova-lab)"]
 license = "MIT"
-repository = "https://github.com/BizWiz3/nova"
+repository = "https://github.com/hypernova-lab/nova"
 private = false
 includes =[
     "pesde.toml",
