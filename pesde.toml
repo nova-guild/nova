@@ -1,4 +1,4 @@
-name = "novalab/nova_core"
+name = "nova_lab/nova_core"
 version = "0.6.0"
 description = "A filesystem-based web framework for Luau runtimes, with out-of-the-box support for Lute, Lune and Zune."
 authors = ["Hypernova Lab (https://github.com/hypernova-lab)"]
