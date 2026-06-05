@@ -1,6 +1,6 @@
-name = "nova/nova_core"
+name = "nova/core"
 version = "0.6.0"
-description = "A convention-driven, runtime-agnostic web framework for the Luau ecosystem."
+description = "A convention-driven, runtime-agnostic web framework for Luau."
 authors = ["Hypernova Lab (https://github.com/hypernova-lab)"]
 license = "MIT"
 repository = "https://github.com/hypernova-lab/nova"
